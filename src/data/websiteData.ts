@@ -354,7 +354,7 @@ export const clientSuccessMetrics: SuccessMetric[] = [
 export const testimonialsData: Testimonial[] = [
   {
     id: "T-01",
-    quote: "AI Infotech redesigned our core transactional ledger system. Their senior engineering team deployed clean Java and Spring Boot structures that effortlessly handle 10,000 requests/sec while maintaining SOC2 levels of data integrity.",
+    quote: "AI INFOTECH redesigned our core transactional ledger system. Their senior engineering team deployed clean Java and Spring Boot structures that effortlessly handle 10,000 requests/sec while maintaining SOC2 levels of data integrity.",
     author: "Elena Rostov",
     role: "VP of Enterprise Engineering",
     company: "Apex Global FinTech",
@@ -362,7 +362,7 @@ export const testimonialsData: Testimonial[] = [
   },
   {
     id: "T-02",
-    quote: "By integrating AI Infotech's automated testing pipelines using Playwright, we slashed our regression cycle times from 14 hours down to 8 minutes. Their QA engineers are incredibly sharp, proactive, and truly understand agile delivery.",
+    quote: "By integrating AI INFOTECH's automated testing pipelines using Playwright, we slashed our regression cycle times from 14 hours down to 8 minutes. Their QA engineers are incredibly sharp, proactive, and truly understand agile delivery.",
     author: "Marc Henderson",
     role: "Director of Product Quality",
     company: "Scribe SaaS Platforms",
@@ -370,7 +370,7 @@ export const testimonialsData: Testimonial[] = [
   },
   {
     id: "T-03",
-    quote: "Migrating our legacy retail system to a scalable AWS Kubernetes cluster was a daunting task. AI Infotech planned the transition with surgical precision, resulting in zero customer-facing downtime and a 42% reduction in monthly cloud spend.",
+    quote: "Migrating our legacy retail system to a scalable AWS Kubernetes cluster was a daunting task. AI INFOTECH planned the transition with surgical precision, resulting in zero customer-facing downtime and a 42% reduction in monthly cloud spend.",
     author: "Siddharth Mehta",
     role: "Chief Technology Officer",
     company: "MetroCart Retailers",

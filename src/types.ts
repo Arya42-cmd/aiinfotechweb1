@@ -26,4 +26,5 @@ export interface Application {
   created_at?: string;
   job_title?: string;
   job_category?: string;
+  bio?: string;
 }

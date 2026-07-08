@@ -9,13 +9,14 @@ import {
   Sun, Moon, Plus, Trash2, Edit3, Save, Undo2
 } from "lucide-react";
 import { Job } from "../types";
+import logoLight from "../assets/logo-light.png";
+import logoDark from "../assets/logo-dark.png";
 
 interface CareersPageProps {
   onNavigateHome: (sectionId?: string) => void;
   isDarkMode: boolean;
   toggleDarkMode: () => void;
   isLoggedIn: boolean;
-  setIsLoggedIn: (val: boolean) => void;
   jobs: Job[];
   setJobs: React.Dispatch<React.SetStateAction<Job[]>>;
   onOpenLogin: () => void;
@@ -29,7 +30,6 @@ export default function CareersPage({
   isDarkMode, 
   toggleDarkMode,
   isLoggedIn,
-  setIsLoggedIn,
   jobs,
   setJobs,
   onOpenLogin,
@@ -394,82 +394,49 @@ export default function CareersPage({
       
       {/* 1. FIXED GLASS NAVIGATION HEADER */}
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${themeHeader}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-4 flex items-center justify-between">
-          
-          {/* Company logo with blue accent */}
-          <button onClick={() => onNavigateHome("hero")} className="flex items-center gap-3 group text-left">
-            <div className="flex flex-col">
-              <div className="flex items-center gap-0">
-                <span className={`text-xl font-extrabold tracking-tight font-sans uppercase ${isDarkMode ? "text-white" : "text-slate-900"}`}>
-                  AIINF
-                </span>
-                <span className="relative flex items-center justify-center w-5 h-5">
-                  <svg className="w-5 h-5 shrink-0 transform group-hover:scale-110 transition-transform duration-300" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    {/* Outer circle power ring */}
-                    <path 
-                      d="M 50 15 C 25 15 15 35 15 55 C 15 75 35 90 55 90 C 75 90 90 75 90 55 C 90 42 82 30 72 23" 
-                      stroke="url(#blue-gradient-careers-header)" 
-                      strokeWidth="14" 
-                      strokeLinecap="round" 
-                      fill="none" 
-                    />
-                    {/* Inner upward swoosh/flame */}
-                    <path 
-                      d="M 45 68 C 45 68 32 50 48 35 C 53 30 58 20 58 20 C 58 20 62 32 58 45 C 54 58 66 65 66 65 C 66 65 55 72 45 68 Z" 
-                      fill="url(#blue-gradient-careers-header)" 
-                    />
-                    <defs>
-                      <linearGradient id="blue-gradient-careers-header" x1="0%" y1="100%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#1e40af" />
-                        <stop offset="40%" stopColor="#2563eb" />
-                        <stop offset="100%" stopColor="#38bdf8" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                </span>
-                <span className={`text-xl font-extrabold tracking-tight font-sans uppercase ${isDarkMode ? "text-white" : "text-slate-900"}`}>
-                  TECH
-                </span>
-              </div>
-              <span className="text-[8px] font-mono tracking-widest text-[#7b7d8c] uppercase block mt-1">
-                Enterprise Solutions
-              </span>
-            </div>
-          </button>
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 xl:px-12 h-[72px] flex items-center justify-between">
+          <div className="flex items-center flex-shrink-0">
+            {/* Company logo with blue accent */}
+            <button onClick={() => onNavigateHome("hero")} className="flex items-center group text-left">
+              <img
+                src={isDarkMode ? logoLight : logoDark}
+                alt="AI INFOTECH logo"
+                className="w-[120px] h-auto"
+              />
+            </button>
+          </div>
 
-          {/* Navigation links with color transition to blue */}
-          <nav className="hidden lg:flex items-center gap-8 text-[11px] font-mono tracking-widest uppercase">
-            <button onClick={() => onNavigateHome("hero")} className={`${isDarkMode ? "text-[#7b7d8c]" : "text-slate-600"} hover:text-accent-primary transition-colors duration-300 py-1.5 font-medium cursor-pointer`}>Home</button>
-            <button onClick={() => onNavigateHome("aboutUs")} className={`${isDarkMode ? "text-[#7b7d8c]" : "text-slate-600"} hover:text-accent-primary transition-colors duration-300 py-1.5 font-medium cursor-pointer`}>About Us</button>
-            <button onClick={() => onNavigateHome("ourServices")} className={`${isDarkMode ? "text-[#7b7d8c]" : "text-slate-600"} hover:text-accent-primary transition-colors duration-300 py-1.5 font-medium cursor-pointer`}>Our Services</button>
-            <button onClick={() => { setSelectedJob(null); window.scrollTo(0, 0); }} className="text-accent-primary font-semibold transition-colors py-1.5 cursor-pointer">Careers</button>
-            <button onClick={() => onNavigateHome("contactMessage")} className={`${isDarkMode ? "text-[#7b7d8c]" : "text-slate-600"} hover:text-accent-primary transition-colors duration-300 py-1.5 font-medium cursor-pointer`}>Contact Us</button>
-            
-            {/* Recruiter Access Link */}
-            {isLoggedIn ? (
-              <div className="flex items-center gap-3 pl-3 border-l border-slate-300/30 dark:border-white/10">
-                <span className="text-accent-primary font-bold py-1.5 text-[10px]">
-                  Recruiter Mode
-                </span>
+          <div className="hidden lg:flex flex-1 justify-center">
+            <nav className="flex items-center gap-9 text-sm whitespace-nowrap font-mono tracking-widest uppercase">
+              <button onClick={() => onNavigateHome("hero")} className={`${isDarkMode ? "text-[#7b7d8c]" : "text-slate-600"} hover:text-accent-primary transition-colors duration-300 py-1.5 font-medium cursor-pointer`}>Home</button>
+              <button onClick={() => onNavigateHome("aboutUs")} className={`${isDarkMode ? "text-[#7b7d8c]" : "text-slate-600"} hover:text-accent-primary transition-colors duration-300 py-1.5 font-medium cursor-pointer`}>About Us</button>
+              <button onClick={() => onNavigateHome("ourServices")} className={`${isDarkMode ? "text-[#7b7d8c]" : "text-slate-600"} hover:text-accent-primary transition-colors duration-300 py-1.5 font-medium cursor-pointer`}>Our Services</button>
+              <button onClick={() => { setSelectedJob(null); window.scrollTo(0, 0); }} className="text-accent-primary font-semibold transition-colors py-1.5 cursor-pointer">Careers</button>
+              <button onClick={() => onNavigateHome("contactMessage")} className={`${isDarkMode ? "text-[#7b7d8c]" : "text-slate-600"} hover:text-accent-primary transition-colors duration-300 py-1.5 font-medium cursor-pointer`}>Contact Us</button>
+              {isLoggedIn ? (
+                <div className="flex items-center gap-3 pl-3 border-l border-slate-300/30 dark:border-white/10">
+                  <span className="text-accent-primary font-bold py-1.5 text-[10px]">
+                    Recruiter Mode
+                  </span>
+                  <button
+                    onClick={onLogout}
+                    className={`${isDarkMode ? "text-rose-400/90" : "text-rose-600/90"} hover:text-rose-500 transition-colors text-[10px] font-mono font-bold uppercase cursor-pointer`}
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
                 <button
-                  onClick={onLogout}
-                  className={`${isDarkMode ? "text-rose-400/90" : "text-rose-600/90"} hover:text-rose-500 transition-colors text-[10px] font-mono font-bold uppercase cursor-pointer`}
+                  onClick={onOpenLogin}
+                  className={`${isDarkMode ? "text-[#7b7d8c]" : "text-slate-600"} hover:text-accent-primary transition-colors duration-300 py-1.5 font-medium cursor-pointer`}
                 >
-                  Logout
+                  LOGIN
                 </button>
-              </div>
-            ) : (
-              <button
-                onClick={onOpenLogin}
-                className={`${isDarkMode ? "text-[#7b7d8c]" : "text-slate-600"} hover:text-accent-primary transition-colors duration-300 relative py-1.5 group font-medium cursor-pointer`}
-              >
-                Login
-              </button>
-            )}
-          </nav>
+              )}
+            </nav>
+          </div>
 
-          {/* Active Navigation CTA */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {/* Theme Toggle Button */}
             <button
               onClick={toggleDarkMode}
@@ -485,7 +452,7 @@ export default function CareersPage({
 
             <button 
               onClick={() => onNavigateHome("contactMessage")}
-              className="hidden sm:inline-flex items-center gap-2 text-[12px] font-mono tracking-wider uppercase text-black bg-accent-primary px-5 py-2.5 font-semibold hover:bg-accent-secondary hover:shadow-[0_0_20px_rgba(255,130,0,0.3)] transition-all duration-300 rounded-full"
+              className="hidden sm:inline-flex items-center gap-2 text-[12px] font-mono tracking-wider uppercase text-black bg-accent-primary px-4 py-2.5 font-semibold hover:bg-accent-secondary hover:shadow-[0_0_20px_rgba(255,130,0,0.3)] transition-all duration-300 rounded-full"
             >
               <span>Get Started</span>
               <ArrowRight className="w-3.5 h-3.5" />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion, useScroll, useSpring, AnimatePresence } from "motion/react";
 import { LogIn, AlertCircle, X, Mail, Lock } from "lucide-react";
 import RedesignPreview from "./components/RedesignPreview";
@@ -37,7 +37,7 @@ export default function App() {
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Failed to load jobs from Supabase", error);
+      showToast("Unable to load job listings. Please refresh the page.", "error");
       setJobs([]);
       return;
     }
@@ -285,7 +285,6 @@ export default function App() {
             isDarkMode={isDarkMode} 
             toggleDarkMode={toggleDarkMode} 
             isLoggedIn={isLoggedIn}
-            setIsLoggedIn={setIsLoggedIn}
             onNavigateHome={handleNavigateHome}
             onOpenLogin={handleOpenLogin}
             onLogout={handleLogout}
@@ -296,7 +295,6 @@ export default function App() {
             toggleDarkMode={toggleDarkMode}
             onNavigateHome={handleNavigateHome}
             isLoggedIn={isLoggedIn}
-            setIsLoggedIn={setIsLoggedIn}
             jobs={jobs}
             setJobs={setJobs}
             onOpenLogin={handleOpenLogin}

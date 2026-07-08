@@ -217,32 +217,7 @@ export default function InteractiveMap({ isDark = false }: InteractiveMapProps) 
 
       {/* Office Information Display (right 5 cols) */}
       <div className="lg:col-span-5 space-y-6">
-        <div className={`space-y-1.5 border-b ${titleBorderClass}`}>
-          <span className="text-xs font-mono tracking-widest text-accent-primary uppercase font-semibold">
-            {activeOffice.type}
-          </span>
-          <h4 className={`text-2xl font-semibold tracking-tight ${textTitleClass}`}>
-            {activeOffice.name}
-          </h4>
-        </div>
-
         <div className="space-y-4">
-          {/* Live Clock Card */}
-          <div className={`p-4 rounded-xl border flex items-center justify-between ${clockCardClass}`}>
-            <div className="flex items-center gap-3">
-              <Clock className="w-5 h-5 text-accent-secondary" />
-              <div>
-                <p className={`text-[11px] font-mono uppercase tracking-wider ${textMutedClass}`}>Local Business Time</p>
-                <p className={`text-sm font-mono font-medium ${textValueClass}`}>{activeOffice.hours}</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <span className={`text-lg font-mono font-bold tracking-wide px-2.5 py-1 rounded border ${clockTimeClass}`}>
-                {localTimes[activeOffice.id] || "00:00:00"}
-              </span>
-            </div>
-          </div>
-
           {/* Address */}
           <div className="flex gap-3.5 items-start">
             <div className={`p-2 rounded-lg border ${iconWrapperClass}`}>

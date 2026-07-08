@@ -7,12 +7,14 @@ import {
   Sun, Moon
 } from "lucide-react";
 import InteractiveMap from "./InteractiveMap";
+import { sendEmail } from "../lib/emailjs";
+import logoLight from "../assets/logo-light.png";
+import logoDark from "../assets/logo-dark.png";
 
 interface RedesignPreviewProps {
   isDarkMode: boolean;
   toggleDarkMode: () => void;
   isLoggedIn: boolean;
-  setIsLoggedIn: (val: boolean) => void;
   onNavigateHome: (sectionId?: string) => void;
   onOpenLogin: () => void;
   onLogout: () => void;
@@ -22,7 +24,6 @@ export default function RedesignPreview({
   isDarkMode, 
   toggleDarkMode,
   isLoggedIn,
-  setIsLoggedIn,
   onNavigateHome,
   onOpenLogin,
   onLogout
@@ -70,13 +71,10 @@ export default function RedesignPreview({
   // Accordion active index for "Professional Support" section
   const [activeAccordion, setActiveStage] = useState<number | null>(0);
 
-  // Careers register state
-  const [careerSuccess, setCareerSuccess] = useState(false);
-  const [careerForm, setCareerForm] = useState({ name: "", email: "", resume: "" });
-  
   // Contact Form state
   const [contactForm, setContactForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [contactErrors, setContactErrors] = useState<{ [key: string]: string }>({});
+  const [contactErrorMessage, setContactErrorMessage] = useState("");
   const [contactSuccess, setContactSuccess] = useState(false);
   const [submittingContact, setSubmittingContact] = useState(false);
 
@@ -172,7 +170,7 @@ export default function RedesignPreview({
   } satisfies Variants;
 
   // Handle Contact Submit
-  const handleContactSubmit = (e: FormEvent) => {
+  const handleContactSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const errors: { [key: string]: string } = {};
     if (!contactForm.name.trim()) errors.name = "Full Name is required";
@@ -181,33 +179,44 @@ export default function RedesignPreview({
     } else if (!/\S+@\S+\.\S+/.test(contactForm.email)) {
       errors.email = "Invalid email address";
     }
+    if (!contactForm.subject.trim()) {
+      errors.subject = "Subject is required";
+    }
     if (!contactForm.message.trim()) {
       errors.message = "Comment or Message is required";
     }
 
     if (Object.keys(errors).length > 0) {
       setContactErrors(errors);
+      setContactErrorMessage("");
       return;
     }
 
     setContactErrors({});
+    setContactErrorMessage("");
     setSubmittingContact(true);
 
-    setTimeout(() => {
-      setSubmittingContact(false);
+    const payload = {
+      name: contactForm.name.trim(),
+      email: contactForm.email.trim(),
+      subject: contactForm.subject.trim(),
+      message: contactForm.message.trim(),
+    };
+
+    try {
+      await sendEmail(payload);
       setContactSuccess(true);
       setContactForm({ name: "", email: "", subject: "", message: "" });
-    }, 1000);
-  };
-
-  const handleCareerSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!careerForm.name.trim() || !careerForm.email.trim()) return;
-    setCareerSuccess(true);
-    setTimeout(() => {
-      setCareerSuccess(false);
-      setCareerForm({ name: "", email: "", resume: "" });
-    }, 2500);
+      addToast("Message sent successfully.", "success");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Unable to send your message. Please try again.";
+      setContactErrorMessage(errorMessage);
+    } finally {
+      setSubmittingContact(false);
+    }
   };
 
   const accordions = [
@@ -238,92 +247,63 @@ export default function RedesignPreview({
       
       {/* 1. FIXED GLASS NAVIGATION HEADER */}
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${themeHeader}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-4 flex items-center justify-between">
-          
-          {/* Company logo with blue accent */}
-          <a href="#hero" className="flex items-center gap-3 group">
-            <div className="flex flex-col">
-              <div className="flex items-center gap-0">
-                <span className={`text-xl font-extrabold tracking-tight font-sans uppercase ${isDarkMode ? "text-white" : "text-slate-900"}`}>
-                  AIINF
-                </span>
-                <span className="relative flex items-center justify-center w-5 h-5">
-                  <svg className="w-5 h-5 shrink-0 transform group-hover:scale-110 transition-transform duration-300" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    {/* Outer circle power ring */}
-                    <path 
-                      d="M 50 15 C 25 15 15 35 15 55 C 15 75 35 90 55 90 C 75 90 90 75 90 55 C 90 42 82 30 72 23" 
-                      stroke="url(#blue-gradient-nav)" 
-                      strokeWidth="14" 
-                      strokeLinecap="round" 
-                      fill="none" 
-                    />
-                    {/* Inner upward swoosh/flame */}
-                    <path 
-                      d="M 45 68 C 45 68 32 50 48 35 C 53 30 58 20 58 20 C 58 20 62 32 58 45 C 54 58 66 65 66 65 C 66 65 55 72 45 68 Z" 
-                      fill="url(#blue-gradient-nav)" 
-                    />
-                    <defs>
-                      <linearGradient id="blue-gradient-nav" x1="0%" y1="100%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#1e40af" />
-                        <stop offset="40%" stopColor="#2563eb" />
-                        <stop offset="100%" stopColor="#38bdf8" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                </span>
-                <span className={`text-xl font-extrabold tracking-tight font-sans uppercase ${isDarkMode ? "text-white" : "text-slate-900"}`}>
-                  TECH
-                </span>
-              </div>
-            </div>
-          </a>
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 xl:px-12 h-[72px] flex items-center justify-between">
+          <div className="flex items-center flex-shrink-0">
+            {/* Company logo */}
+            <a href="#hero" className="flex items-center group">
+              <img
+                src={isDarkMode ? logoLight : logoDark}
+                alt="AI INFOTECH logo"
+                className="w-[120px] h-auto"
+              />
+            </a>
+          </div>
 
-          {/* Navigation links with color transition to blue */}
-          <nav className="hidden lg:flex items-center gap-8 text-[11px] font-mono tracking-widest uppercase">
-            {["Home", "About Us", "Our Services", "Careers", "Contact Us"].map((link, idx) => {
-              const hrefs = ["#hero", "#aboutUs", "#ourServices", "#careers", "#contactMessage"];
-              return (
-                <a 
-                  key={idx} 
-                  href={hrefs[idx]} 
-                  className={`${isDarkMode ? "text-[#7b7d8c]" : "text-slate-600"} hover:text-accent-primary transition-colors duration-300 relative py-1.5 group font-medium`}
-                >
-                  {link}
-                  <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-accent-primary group-hover:w-full transition-all duration-300" />
-                </a>
-              );
-            })}
-            
-            {/* Recruiter Access Action */}
-            {isLoggedIn ? (
-              <div className="flex items-center gap-3 pl-3 border-l border-slate-300/30 dark:border-white/10">
-                <a
-                  href="#careers"
-                  className="text-accent-primary font-bold hover:text-accent-secondary transition-colors duration-300 py-1.5 relative group"
-                >
-                  Recruiter Panel
-                  <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-accent-primary" />
-                </a>
+          <div className="hidden lg:flex flex-1 justify-center">
+            <nav className="flex items-center gap-9 text-sm whitespace-nowrap font-mono tracking-widest uppercase">
+              {["Home", "About Us", "Our Services", "Careers", "Contact Us"].map((link, idx) => {
+                const hrefs = ["#hero", "#aboutUs", "#ourServices", "#careers", "#contactMessage"];
+                return (
+                  <a
+                    key={idx}
+                    href={hrefs[idx]}
+                    className={`${isDarkMode ? "text-[#7b7d8c]" : "text-slate-600"} hover:text-accent-primary transition-colors duration-300 relative py-1.5 group font-medium`}
+                  >
+                    {link}
+                    <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-accent-primary group-hover:w-full transition-all duration-300" />
+                  </a>
+                );
+              })}
+
+              {isLoggedIn ? (
+                <div className="flex items-center gap-3 pl-3 border-l border-slate-300/30 dark:border-white/10">
+                  <a
+                    href="#careers"
+                    className="text-accent-primary font-bold hover:text-accent-secondary transition-colors duration-300 py-1.5 relative group"
+                  >
+                    Recruiter Panel
+                    <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-accent-primary" />
+                  </a>
+                  <button
+                    onClick={onLogout}
+                    className={`${isDarkMode ? "text-rose-400/90" : "text-rose-600/90"} hover:text-rose-500 transition-colors text-[10px] font-mono font-bold uppercase cursor-pointer`}
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
                 <button
-                  onClick={onLogout}
-                  className={`${isDarkMode ? "text-rose-400/90" : "text-rose-600/90"} hover:text-rose-500 transition-colors text-[10px] font-mono font-bold uppercase cursor-pointer`}
+                  onClick={onOpenLogin}
+                  className={`${isDarkMode ? "text-[#7b7d8c]" : "text-slate-600"} hover:text-accent-primary transition-colors duration-300 relative py-1.5 group font-medium cursor-pointer`}
                 >
-                  Logout
+                  LOGIN
+                  <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-accent-primary group-hover:w-full transition-all duration-300" />
                 </button>
-              </div>
-            ) : (
-              <button
-                onClick={onOpenLogin}
-                className={`${isDarkMode ? "text-[#7b7d8c]" : "text-slate-600"} hover:text-accent-primary transition-colors duration-300 relative py-1.5 group font-medium cursor-pointer`}
-              >
-                Login
-                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-accent-primary group-hover:w-full transition-all duration-300" />
-              </button>
-            )}
-          </nav>
+              )}
+            </nav>
+          </div>
 
-          {/* Active Navigation CTA */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {/* Theme Toggle Button */}
             <button
               onClick={toggleDarkMode}
@@ -339,7 +319,7 @@ export default function RedesignPreview({
 
             <a 
               href="#contactMessage" 
-              className="hidden sm:inline-flex items-center gap-2 text-[12px] font-mono tracking-wider uppercase text-black bg-accent-primary px-5 py-2.5 font-semibold hover:bg-accent-secondary hover:shadow-[0_0_20px_rgba(255,130,0,0.3)] transition-all duration-300 rounded-full"
+              className="hidden sm:inline-flex items-center gap-2 text-[12px] font-mono tracking-wider uppercase text-black bg-accent-primary px-4 py-2.5 font-semibold hover:bg-accent-secondary hover:shadow-[0_0_20px_rgba(255,130,0,0.3)] transition-all duration-300 rounded-full"
             >
               <span>Get Started</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -487,7 +467,14 @@ export default function RedesignPreview({
           <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4 w-full sm:w-auto">
             <a 
               href="#contactMessage" 
-              onClick={() => addToast("Establishing connection channel. Scroll down to message our enterprise experts!", "success")}
+              onClick={(event) => {
+                event.preventDefault();
+                const target = document.getElementById("contactMessage");
+                if (target) {
+                  target.scrollIntoView({ behavior: "smooth" });
+                  window.history.replaceState(null, "", "#contactMessage");
+                }
+              }}
               className="bg-accent-primary text-black font-semibold font-mono text-[13px] uppercase tracking-wider px-8 py-4 rounded-full hover:bg-accent-secondary transition-all shadow-[0_4px_25px_rgba(255,130,0,0.3)] hover:shadow-[0_4px_35px_rgba(255,130,0,0.45)] text-center hover:scale-[1.03] duration-300"
             >
               Connect With Us
@@ -507,7 +494,7 @@ export default function RedesignPreview({
       </section>
 
       {/* 3. VISION & MISSION SECTION */}
-      <section className={`py-24 px-4 sm:px-8 border-b relative transition-colors duration-300 ${isDarkMode ? "border-white/5 bg-[#0a0a0a]/40" : "border-slate-200 bg-slate-100/30"}`}>
+      <section className={`py-16 px-4 sm:px-8 border-b relative transition-colors duration-300 ${isDarkMode ? "border-white/5 bg-[#0a0a0a]/40" : "border-slate-200 bg-slate-100/30"}`}>
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
           
           {/* Vision card with precise hover perspective scale */}
@@ -552,8 +539,8 @@ export default function RedesignPreview({
       </section>
 
       {/* NEW 3D SCROLL & PHOTO GRID (THINK, TRUST, TINKER PHILOSOPHY) */}
-      <section className={`py-24 px-4 sm:px-8 border-b relative transition-colors duration-300 ${isDarkMode ? "border-white/5 bg-[#0a0a0a]/20" : "border-slate-200 bg-white"}`}>
-        <div className="max-w-7xl mx-auto space-y-16">
+      <section className={`py-16 px-4 sm:px-8 border-b relative transition-colors duration-300 ${isDarkMode ? "border-white/5 bg-[#0a0a0a]/20" : "border-slate-200 bg-white"}`}>
+        <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <span className="text-xs font-mono tracking-widest text-accent-primary uppercase font-bold">Our Philosophy</span>
             <h2 className={`text-4xl sm:text-5xl font-extrabold tracking-tighter ${isDarkMode ? "text-white" : "text-slate-900"}`}>How We Build Solutions</h2>
@@ -633,8 +620,8 @@ export default function RedesignPreview({
       </section>
 
       {/* 4. OUR STORY SECTION */}
-      <section id="aboutUs" ref={storySectionRef} className={`py-24 px-4 sm:px-8 border-b relative transition-colors duration-300 ${isDarkMode ? "border-white/5 bg-[#151526]" : "border-slate-200 bg-slate-50"}`} style={{ perspective: "1000px" }}>
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <section id="aboutUs" ref={storySectionRef} className={`py-16 px-4 sm:px-8 border-b relative transition-colors duration-300 ${isDarkMode ? "border-white/5 bg-[#151526]" : "border-slate-200 bg-slate-50"}`} style={{ perspective: "1000px" }}>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           {/* Story left column / Image with 3D entry */}
           <motion.div 
             initial={{ opacity: 0, x: -50, rotateY: 15, scale: 0.95 }}
@@ -691,8 +678,8 @@ export default function RedesignPreview({
       </section>
 
       {/* 5. BRING INNOVATION TO YOUR COMPANY (The 6 Pillars Grid) */}
-      <section className={`py-24 px-4 sm:px-8 border-b relative transition-colors duration-300 ${isDarkMode ? "border-white/5 bg-[#0a0a0a]/40" : "border-slate-200 bg-slate-100/30"}`}>
-        <div className="max-w-7xl mx-auto space-y-16">
+      <section className={`py-16 px-4 sm:px-8 border-b relative transition-colors duration-300 ${isDarkMode ? "border-white/5 bg-[#151526]" : "border-slate-200 bg-slate-50"}`}>
+        <div className="max-w-7xl mx-auto space-y-12">
           
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <span className="text-xs font-mono tracking-widest text-accent-primary uppercase font-bold">Value Proposition</span>
@@ -760,7 +747,7 @@ export default function RedesignPreview({
           
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <span className="text-xs font-mono tracking-widest text-accent-secondary uppercase font-semibold">Why Corporate Partners Align with Us</span>
-            <h2 className={`text-4xl sm:text-5xl font-extrabold tracking-tighter ${isDarkMode ? "text-white" : "text-slate-900"}`}>Why AI Infotech Solutions?</h2>
+            <h2 className={`text-4xl sm:text-5xl font-extrabold tracking-tighter ${isDarkMode ? "text-white" : "text-slate-900"}`}>Why AI INFOTECH Solutions?</h2>
           </div>
 
           <motion.div 
@@ -809,8 +796,8 @@ export default function RedesignPreview({
       </section>
 
       {/* 7. DETAILED SERVICES SECTION */}
-      <section id="ourServices" ref={servicesSectionRef} className="py-24 px-4 sm:px-8 border-b border-white/5 bg-[#0a0a0a]/40">
-        <div className="max-w-7xl mx-auto space-y-16">
+      <section id="ourServices" ref={servicesSectionRef} className="py-16 px-4 sm:px-8 border-b border-white/5 bg-[#0a0a0a]/40">
+        <div className="max-w-7xl mx-auto space-y-12">
           <div className="w-full h-64 overflow-hidden relative shadow-lg mb-16 border border-white/10">
             <motion.img 
               src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=2070&auto=format&fit=crop"
@@ -886,8 +873,8 @@ export default function RedesignPreview({
       </section>
 
       {/* 8. BE IN DEMAND WITH OUR PROFESSIONAL SUPPORT (ACCORDIONS) */}
-      <section className={`py-24 px-4 sm:px-8 border-b relative transition-colors duration-300 ${isDarkMode ? "border-white/5 bg-[#151526]" : "border-slate-200 bg-slate-50"}`}>
-        <div className="max-w-4xl mx-auto space-y-16">
+      <section className={`py-16 px-4 sm:px-8 border-b relative transition-colors duration-300 ${isDarkMode ? "border-white/5 bg-[#151526]" : "border-slate-200 bg-slate-50"}`}>
+        <div className="max-w-4xl mx-auto space-y-12">
           
           <div className="text-center space-y-3">
             <span className="text-xs font-mono tracking-widest text-accent-secondary uppercase font-semibold">Professional Support Integration</span>
@@ -948,69 +935,11 @@ export default function RedesignPreview({
         </div>
       </section>
 
-      {/* 9. WE ARE ALWAYS ON THE LOOKOUT FOR AWESOME PEOPLE (CAREERS) */}
-      <section id="careers" className={`py-24 px-4 sm:px-8 border-b relative overflow-hidden transition-colors duration-300 ${isDarkMode ? "border-white/5 bg-[#0a0a0a]/40" : "border-slate-200 bg-slate-100/30"}`}>
-        <div className="absolute inset-0 pointer-events-none opacity-30">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] rounded-full bg-accent-primary/10 blur-[100px]" />
-        </div>
-
-        <div className="max-w-4xl mx-auto text-center space-y-10 relative z-10">
-          <div className="space-y-4">
-            <span className="text-xs font-mono tracking-widest text-accent-primary uppercase font-bold">Work With Us</span>
-            <h2 className={`text-4xl sm:text-5xl font-extrabold tracking-tighter max-w-2xl mx-auto leading-tight ${isDarkMode ? "text-white" : "text-slate-900"}`}>
-              We are always on the lookout for awesome people to work with us.
-            </h2>
-            <p className={`max-w-xl mx-auto ${themeTextMuted}`}>
-              We are constantly seeking passionate, motivated professionals to augment our software testing, development, and support divisions. Submit your interest instantly or visit our dedicated careers listing above.
-            </p>
-          </div>
-
-          <div className="max-w-md mx-auto">
-            {careerSuccess ? (
-              <div className="p-6 bg-emerald-500/10 border border-emerald-500/30 rounded-xl space-y-2">
-                <CheckCircle className="w-8 h-8 text-emerald-500 mx-auto" />
-                <h4 className={`text-sm font-bold ${isDarkMode ? "text-white" : "text-slate-800"}`}>Application Logged</h4>
-                <p className="text-xs text-slate-400">Our recruitment team (recruiting@aiinfotech.co.in) will reach out to you shortly!</p>
-              </div>
-            ) : (
-              <form onSubmit={handleCareerSubmit} className="space-y-3 text-left">
-                <input
-                  type="text"
-                  placeholder="Your Full Name"
-                  required
-                  value={careerForm.name}
-                  onChange={(e) => setCareerForm({ ...careerForm, name: e.target.value })}
-                  className={`w-full ${themeInput}`}
-                />
-                <input
-                  type="email"
-                  placeholder="Your Email Address"
-                  required
-                  value={careerForm.email}
-                  onChange={(e) => setCareerForm({ ...careerForm, email: e.target.value })}
-                  className={`w-full ${themeInput}`}
-                />
-                <input
-                  type="text"
-                  placeholder="LinkedIn or Portfolio Link"
-                  value={careerForm.resume}
-                  onChange={(e) => setCareerForm({ ...careerForm, resume: e.target.value })}
-                  className={`w-full ${themeInput}`}
-                />
-                <button
-                  type="submit"
-                  className="w-full bg-accent-primary hover:bg-accent-secondary text-black font-mono font-bold text-[12px] uppercase tracking-wider py-3.5 rounded-full transition-all shadow-md cursor-pointer hover:shadow-[0_0_20px_rgba(255,130,0,0.3)]"
-                >
-                  Send Career Application
-                </button>
-              </form>
-            )}
-          </div>
-        </div>
-      </section>
-
       {/* 10. SEND US A MESSAGE SECTION (CONTACT) */}
-      <section id="contactMessage" className="py-24 px-4 sm:px-8 border-b border-white/5 bg-[#151526] relative">
+      <section
+        id="contactMessage"
+        className={`py-24 px-4 sm:px-8 border-b relative ${isDarkMode ? "border-white/5 bg-[#151526]" : "border-slate-200 bg-slate-100"}`}
+      >
         <div className="max-w-7xl mx-auto space-y-16">
           
           <div className="text-center max-w-3xl mx-auto space-y-3">
@@ -1145,6 +1074,10 @@ export default function RedesignPreview({
                     {contactErrors.message && <p className="text-[10px] text-accent-primary font-mono">{contactErrors.message}</p>}
                   </div>
 
+                  {contactErrorMessage ? (
+                    <p className="text-sm text-rose-500 font-medium">{contactErrorMessage}</p>
+                  ) : null}
+
                   <button
                     type="submit"
                     disabled={submittingContact}
@@ -1163,7 +1096,7 @@ export default function RedesignPreview({
           <div className="space-y-6 pt-10">
             <div className="text-center space-y-2">
               <span className="text-[9px] font-mono tracking-widest text-accent-primary uppercase font-bold block">Office Telemetry Map</span>
-              <h3 className={`text-2xl font-bold tracking-tight ${isDarkMode ? "text-white" : "text-slate-900"}`}>Global Office Operations Map</h3>
+              <h3 className={`text-2xl font-bold tracking-tight ${isDarkMode ? "text-white" : "text-slate-900"}`}>Office Map</h3>
             </div>
             <InteractiveMap isDark={isDarkMode} />
           </div>

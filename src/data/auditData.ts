@@ -40,7 +40,7 @@ export const auditIssues: AuditIssue[] = [
     title: "Generic 'Hero' Banner and Weak Value Proposition",
     impact: "High",
     currentProblem: "Generic stock imagery, vague claims of 'excellence', low contrast headline text over complex background, and secondary buttons of equal visual weight.",
-    whyBadUX: "Fails to capture interest in the first 3 seconds. The user cannot quickly tell what makes AI Infotech different from thousands of other IT agencies.",
+    whyBadUX: "Fails to capture interest in the first 3 seconds. The user cannot quickly tell what makes AI INFOTECH different from thousands of other IT agencies.",
     bestPractice: "A clear, bold headline explaining target business value (e.g. 'We engineer elite software architectures for global enterprises'), dual distinct CTA weights (primary fill vs secondary outline), and motion-graphics representing tech-stack telemetry.",
     exactSolution: "Design a split-column hero featuring Space Grotesk typography, an interactive canvas background with floating tech illustrations, dual CTAs ('Schedule Strategy Call' and 'Explore Solutions'), and concrete statistics (e.g. '99.2% SLA Adherence') directly under the CTAs."
   },

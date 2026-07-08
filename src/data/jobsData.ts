@@ -7,7 +7,7 @@ export const defaultJobs: Job[] = [
     category: "Quality Assurance",
     type: "Full Time",
     location: "Chennai",
-    description: "AI Infotech is looking for a QA Automation Engineer to join our Quality Assurance team. The role involves building, executing, and maintaining automation frameworks for web and API testing, while working closely with our on-shore client in the USA. The ideal candidate should have strong technical expertise in automation tools and a passion for delivering high-quality software products.",
+    description: "AI INFOTECH is looking for a QA Automation Engineer to join our Quality Assurance team. The role involves building, executing, and maintaining automation frameworks for web and API testing, while working closely with our on-shore client in the USA. The ideal candidate should have strong technical expertise in automation tools and a passion for delivering high-quality software products.",
     responsibilities: [
       "Design, develop, and maintain automation test scripts using Java, Selenium, Playwright, Karate.",
       "Perform API testing using tools like Postman and Swagger.",
